@@ -1,26 +1,23 @@
 import React, { useState } from "react";
+import { useMutation } from "@apollo/client";
+import { LOGIN_USER } from "../utils/mutations";
+import Auth from "../utils/auth";
 
 export const Login = (props) => {
     const [email, setEmail] = useState('');
     const [pass, setPass] = useState('');
     const [wrongInfo, setWrongInfo] = useState('');
 
-    const handleSubmit = (e) => {
+    const [login] = useMutation(LOGIN_USER);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(email);
-
-            fetch('https://cal-pal-server-273e253c14e5.herokuapp.com/graphql', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query: `mutation { login(email: "${email}", password: "${pass}")  { token } }` })
-        }).then(res => res.json()).then(data => {
-            console.log(data.data.login)
-            if (data.data.login) {
-            localStorage.setItem('id_token', data.data.login.token);
-            window.location.pathname='/dashboard' 
-            } setWrongInfo("Incorrect Username or Password -- Try again!");
-
-        }).catch(err => console.log(err))
+        try {
+            const { data } = await login({ variables: { email, password: pass } });
+            Auth.login(data.login.token);
+        } catch (err) {
+            setWrongInfo("Incorrect Username or Password -- Try again!");
+        }
     }
 
     return (
