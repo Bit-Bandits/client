@@ -12,7 +12,7 @@ import Homepage from "./pages/Homepage";
 import AboutUs from "./pages/AboutUs";
 
 const httpLink = createHttpLink({
-  uri: 'https://cal-pal-server-273e253c14e5.herokuapp.com/graphql'
+  uri: process.env.REACT_APP_API_URL || 'http://localhost:3001/graphql',
 });
 
 const authLink = setContext((_, { headers }) => {
